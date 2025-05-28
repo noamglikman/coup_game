@@ -12,6 +12,7 @@ namespace coup {
     class Game {
     public:
         Game(){}
+        // Constructor
         string turn(){
             if (_players.empty()) {
                 throw runtime_error("No players in the game");
@@ -41,13 +42,24 @@ namespace coup {
         void add_player(Player* player);
         //remove a player from the game
         void remove_player(Player& player,bool using_gui=false);
-        //next turn
+        
+        // This function updates the turn to the next active player.
+        // It skips inactive players and handles cases where the current player is sanctioned or blocked.
+        // If the last played player is not active, it will set the next active player as the current turn.
+        // If no active players are found, it will continue to loop until a valid player is found.
+        // It also resets the last played player's sanctioned status and marks their turn as over.
+        // If the last played player is sanctioned and blocked and dont have enough money *or* not blocked but cant 
+        //do arrest because the player that left with him is the one that got arrested last time
+        //(edge case), it will automatically end their turn.
+        /**
+         * @brief Advances the game to the next player's turn.
+         */
         void next_turn() {
-        // פתח את החסימה של השחקן האחרון ששיחק (אם יש כזה)
+        //
         if (!last_played.empty()) {
             Player* last = last_played.back();
             if (last != nullptr) {
-                last->set_sanctioned(false); // ודא שיש set_sanctioned(bool) במחלקת Player
+                last->set_sanctioned(false); 
                 last->set_one_turn_is_over();
             }
         }
@@ -59,7 +71,9 @@ namespace coup {
             if (!currentPlayer->is_active()) {
                 continue; 
             }
-
+            // Check if the current player is sanctioned and blocked, and has less than 3 coins
+            // or if they are sanctioned and cannot do an arrest
+            // (edge case where the last arrested player is the same as the current player)
             if ((currentPlayer->is_sanctioned() && currentPlayer->get_Blocked() == true && currentPlayer->coins() <3 )||(currentPlayer->is_sanctioned() 
             && get_can_do_arrest(_players,currentPlayer)==false&&currentPlayer->coins() <3))
             {
@@ -71,6 +85,14 @@ namespace coup {
             break;
         } while (true);
     }
+    /**
+     * @brief Returns the name of the current player.
+     * @return The name of the current player.
+     * @throws if the game is no over yet.
+     */
+    //winner function
+    // Returns the name of the winner if the game is over, otherwise throws an error
+    // This function checks if there is only one active player left in the game.
         string winner(){
             int count=0;
             for(int i = 0; i < _players.size(); i++) {
@@ -94,7 +116,7 @@ namespace coup {
             if (!last_arrested.empty()){return last_arrested.back();} 
             return""; 
         }
-
+        //operator overload for printing the game state
         friend ostream& operator<<(ostream& os, const Game& game) {
             os << "Game Players:\n";
             for ( int i = 0; i < game._players.size(); ++i) {
@@ -109,6 +131,9 @@ namespace coup {
             }
             return os;
         }
+        /// @brief Adds a player to the game.
+        /// @param player Pointer to the player to be added.
+        /// @param player_name 
         void add_to_players_is_out_of_game(string player_name){
             _players_is_out_of_game.push_back(player_name);
         }
@@ -120,10 +145,18 @@ namespace coup {
             }
         }
         Game& operator=(const Game& other);
-
+        /**
+         * @brief Adds a player to the last played list.
+         * @param player Pointer to the player to be added.
+         */
         void add_last_played(Player* player) {
         last_played.push_back(player);
         }
+        /**
+         * @brief Returns the last player who played.
+         * @return Pointer to the last player who played.
+         * @throws if there are no players available for undo coup.
+         */
         Player * get_last_player(){
             if (!last_played.empty()) {
                 return last_played.back();
@@ -131,7 +164,10 @@ namespace coup {
                 throw runtime_error("No players available for undo coup");
             }
         }
-        // Game.hpp
+        /**
+         * @brief Checks if the game is over.
+         * @return True if the game is over, false otherwise.
+         */
         bool is_game_over() const {
             return _game_over;
         }
@@ -140,6 +176,12 @@ namespace coup {
         void set_can_do_arrest(bool _can_do_arrest){
             _can_do_arrest=_can_do_arrest;
         }
+        /**
+         * @brief Checks if a player can do an arrest.
+         * @param players Vector of players in the game.
+         * @param currentPlayer Pointer to the current player.
+         * @return True if the player can do an arrest, false otherwise.
+         */
         bool get_can_do_arrest(vector<Player*> players,Player *currentPlayer){
             for(int i=0;i<players.size();i++){
                 if(_players[i]->is_active() == true&&_players[i]!=currentPlayer&&get_last_arrested()!=_players[i]->getName()){

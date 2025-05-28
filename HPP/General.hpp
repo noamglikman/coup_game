@@ -22,7 +22,10 @@ namespace coup {
         bool is_active() const{
             return _is_active;
         } 
-        
+    /**
+     * @brief Allows the General to undo the last coup action made by any player, by paying 5 coins.
+     * this function is for the difrrent between the GUI and the console
+     */
     void set_active(bool is_active, bool using_gui=false){
         
         if(coins()>=5&&is_active==false){
@@ -65,9 +68,7 @@ namespace coup {
         }
     }
 
-     bool askToStayAlive();
-
-    
+   
 
     // }
         int coins() const{
@@ -82,6 +83,7 @@ namespace coup {
         void remove_coins(int coins){
             _coinNum -= coins;
         }
+         bool askToStayAlive();
         void undo_coup( Player &player);
         // Destructor
 };

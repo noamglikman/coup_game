@@ -10,34 +10,26 @@ OBJ = OBJ/
 
 header = $(HPP)Baron.hpp $(HPP)General.hpp $(HPP)Governor.hpp $(HPP)Judge.hpp $(HPP)Merchant.hpp $(HPP)Player.hpp $(HPP)Spy.hpp GameGUI.hpp
 
-# קבצי אובייקט לפרויקט הראשי
 OBJS = $(OBJ)Demo.o $(OBJ)Baron.o $(OBJ)General.o $(OBJ)Governor.o $(OBJ)Judge.o $(OBJ)Merchant.o $(OBJ)Player.o $(OBJ)Spy.o $(OBJ)Game.o
 
-# קבצי אובייקט לגרסת הבדיקות, כולל test.o
 TEST_OBJS = $(OBJ)test.o $(OBJ)Baron.o $(OBJ)General.o $(OBJ)Governor.o $(OBJ)Judge.o $(OBJ)Merchant.o $(OBJ)Player.o $(OBJ)Spy.o $(OBJ)Game.o
 
-# קבצי אובייקט עבור GUI
 GUI_OBJS = $(OBJ)GameGUI.o $(OBJ)Game.o $(OBJ)Player.o $(OBJ)Baron.o $(OBJ)General.o $(OBJ)Governor.o $(OBJ)Judge.o $(OBJ)Merchant.o $(OBJ)Spy.o
 
-# יצירת תיקיית OBJ במידת הצורך
 $(OBJ):
 	mkdir -p $(OBJ)
 
 all: $(TARGET)
 
-# קישור לקובץ הראשי demo
 $(TARGET): $(OBJS)
 	$(C) -Wall -o $(TARGET) $(OBJS) -lsfml-graphics -lsfml-window -lsfml-system
 
-# קישור לקובץ הבדיקות
 $(TEST_TARGET): $(TEST_OBJS)
 	$(C) -Wall -std=c++17 -g -o $(TEST_TARGET) $(TEST_OBJS) -lsfml-graphics -lsfml-window -lsfml-system
 
-# קישור ל-GUI
 $(GUI_TARGET): $(GUI_OBJS)
 	$(C) -Wall -o $(GUI_TARGET) $(GUI_OBJS) -lsfml-graphics -lsfml-window -lsfml-system
 
-# קומפילציה של קבצי cpp ל-obj
 
 $(OBJ)Demo.o: Demo.cpp $(header) | $(OBJ)
 	$(C) $(CFLAGS) Demo.cpp -o $(OBJ)Demo.o
@@ -72,8 +64,8 @@ $(OBJ)Player.o: $(CPP)Player.cpp $(header) | $(OBJ)
 $(OBJ)Spy.o: $(CPP)Spy.cpp $(header) | $(OBJ)
 	$(C) $(CFLAGS) $(CPP)Spy.cpp -o $(OBJ)Spy.o
 
-# הפעלת הפרויקטים
-
+valgrind: $(TARGET)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(TARGET)
 Demo: $(TARGET)
 	./$(TARGET)
 

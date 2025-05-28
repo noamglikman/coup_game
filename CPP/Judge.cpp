@@ -26,21 +26,27 @@ namespace coup{
  */
     
 void Judge::undo_bribe(Player &player){
+    // Check if the game is over
     if(_game.is_game_over()) {
             throw runtime_error("Game is over, you can't gather");
         }
+    // Check if the player is active
     if (!_is_active) {
         throw runtime_error("Player is not active");
     }
+    //Check if he has 10 or more coins
     if(_coinNum>=10){
         throw runtime_error("you must coup someone because you have more then 10 coins,choose player to coup");
     }
+    // Check if the player is trying to undo their own move
     if(player==*this){
        throw runtime_error("you cant activate this action on yourself");
     }
+    // Check if the last move of the player was a bribe
     if(player.LastMove_of_each_player()!="bribe"){
         throw runtime_error("Judge can undo only bribe");
     }
+    // Perform the undo action
     player.add_move("undid_bribe"); // Update the last move of the player
     player.set_cant_bribe(true);//שחקן חסום כלומר אינו יכול לעשות bribe
     _game.next_turn();

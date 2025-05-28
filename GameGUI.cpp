@@ -13,95 +13,6 @@
 #include "Judge.hpp"
 #include "Merchant.hpp"
 #include "GameGUI.hpp"
-
-
-// using namespace std;
-// using namespace coup;
-//  //Player* createPlayers(Game& game, std::string playerName, int numPlayers);
-// void runGameSetup(std::vector<std::string>& playerNames) {
-//     sf::RenderWindow window(sf::VideoMode(800, 600), "Game Setup");
-//     sf::Font font;
-//     if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")) {
-//         std::cout << "Failed to load font\n";
-//         return;
-//     }
-
-//     enum class State { AskNumber, AskNames, Done };
-//     State state = State::AskNumber;
-
-//     int numPlayers = 0;
-//     int currentPlayer = 1;
-//     std::string inputText;
-
-//     sf::Text prompt;
-//     prompt.setFont(font);
-//     prompt.setCharacterSize(24);
-//     prompt.setFillColor(sf::Color(255, 0, 255));
-//     prompt.setPosition(50, 50);
-
-//     sf::Text inputDisplay;
-//     inputDisplay.setFont(font);
-//     inputDisplay.setCharacterSize(30);
-//     inputDisplay.setFillColor(sf::Color::Black);
-//     inputDisplay.setPosition(50, 150);
-
-//     while (window.isOpen()) {
-//         sf::Event event;
-//         while (window.pollEvent(event)) {
-//             if (event.type == sf::Event::Closed)
-//                 window.close();
-
-//             else if (event.type == sf::Event::TextEntered) {
-//                 if (event.text.unicode == 8) {
-//                     if (!inputText.empty())
-//                         inputText.pop_back();
-//                 } else if (event.text.unicode == 13) {
-//                     if (!inputText.empty()) {
-//                         if (state == State::AskNumber) {
-//                             try {
-//                                 int n = std::stoi(inputText);
-//                                 if (n >= 2 && n <= 6) {
-//                                     numPlayers = n;
-//                                     playerNames.reserve(numPlayers);
-//                                     inputText.clear();
-//                                     currentPlayer = 1;
-//                                     state = State::AskNames;
-//                                 } else {
-//                                     inputText.clear();
-//                                 }
-//                             } catch (...) {
-//                                 inputText.clear();
-//                             }
-//                         } else if (state == State::AskNames) {
-//                             playerNames.push_back(inputText);
-//                             inputText.clear();
-//                             currentPlayer++;
-//                             if (currentPlayer > numPlayers) {
-//                                 state = State::Done;
-//                                 window.close();
-//                             }
-//                         }
-//                     }
-//                 } else if (event.text.unicode < 128) {
-//                     inputText += static_cast<char>(event.text.unicode);
-//                 }
-//             }
-//         }
-
-//         if (state == State::AskNumber) {
-//             prompt.setString("Enter number of players (2-6):");
-//         } else if (state == State::AskNames) {
-//             prompt.setString("Enter name for player " + std::to_string(currentPlayer) + ":");
-//         }
-
-//         inputDisplay.setString(inputText);
-
-//         window.clear(sf::Color(230, 230, 255));
-//         window.draw(prompt);
-//         window.draw(inputDisplay);
-//         window.display();
-//     }
-// }
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
@@ -109,7 +20,13 @@
 
 using namespace std;
 using namespace coup;
-
+/**
+ * @brief Runs the game setup GUI to gather player names and number of players.
+ * @param playerNames A vector to store the names of the players.
+ * This function creates a window where players can enter their names and the number of players.
+ * It handles input validation, displays error messages, and transitions between states for entering the number of players and their names.
+ * The game setup will close the window once all player names are collected.
+ */
 void runGameSetup(std::vector<std::string>& playerNames) {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Game Setup");
     sf::Font font;
@@ -174,7 +91,6 @@ void runGameSetup(std::vector<std::string>& playerNames) {
                             }
                         } else if (state == State::AskNames) {
                             if (std::find(playerNames.begin(), playerNames.end(), inputText) != playerNames.end()) {
-                                // שם קיים כבר
                                 errorMessage = "Name already taken, try another.";
                                 errorClock.restart();
                                 inputText.clear();
@@ -196,7 +112,7 @@ void runGameSetup(std::vector<std::string>& playerNames) {
             }
         }
 
-        // הצגת הודעה - אם יש שגיאה והיא לא עברה יותר מ-3 שניות, מציגים את errorMessage
+        
         if (!errorMessage.empty()) {
             if (errorClock.getElapsedTime().asSeconds() < 3.0f) {
                 prompt.setString(errorMessage);
@@ -219,6 +135,11 @@ void runGameSetup(std::vector<std::string>& playerNames) {
         window.display();
     }
 }
+/**
+ * @brief Displays the main menu with a start button.
+ * @param playerNames A vector to store the names of the players.
+ * This function creates a window with a start button that, when clicked, will close the window and run the game setup.
+ */
 void showMainMenu(std::vector<std::string>& playerNames) {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Coup");
     sf::Font font;
@@ -261,7 +182,14 @@ void showMainMenu(std::vector<std::string>& playerNames) {
         window.display();
     }
 }
-
+/**
+ * @brief Creates a player with a random role based on the number of players.
+ * @param game The game instance to which the player will be added.
+ * @param playerName The name of the player.
+ * @param numPlayers The total number of players in the game.
+ * @return A pointer to the created Player object.
+ * This function randomly assigns a role to the player from the available roles based on the number of players.
+ */
 Player *creat_player(Game& game, string playerName,int numPlayers) {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -289,6 +217,13 @@ Player *creat_player(Game& game, string playerName,int numPlayers) {
             throw std::runtime_error("Invalid role generated");
     }
 }
+/**
+ * @brief Asks the General if they want to save themselves when they are about to be removed from the game.
+ * @param window The SFML render window for displaying the question.
+ * @param generalName The name of the General player.
+ * @return true if the General chooses to save themselves, false otherwise.
+ * This function creates a simple GUI with a question and two buttons (Yes and No) for the General to respond.
+ */
 bool askGeneralSave(sf::RenderWindow& window, const std::string& generalName) {
     sf::Font font;
     if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")) {
@@ -355,12 +290,19 @@ bool askGeneralSave(sf::RenderWindow& window, const std::string& generalName) {
 
     return false;
 }
+/**
+ * @brief Displays the players' board with their cards and actions.
+ * @param players A vector of pointers to Player objects.
+ * @param game A pointer to the Game object.
+ * This function creates a window that displays each player's card, their coins, and available actions.
+ * It allows players to select actions and targets for those actions, handling events and rendering updates.
+ */
 void showPlayersBoard(std::vector<Player*>& players, Game* game) {
-    int cardWidth = 480; // שמירה על גודל הכרטיסים
+    int cardWidth = 480; 
     int cardHeight = 180;
     int spacing = 40;
-    int buttonWidth = 50; // הקטנת רוחב הכפתורים
-    int buttonHeight = 20; // הקטנת גובה הכפתורים
+    int buttonWidth = 50; 
+    int buttonHeight = 20;
 
     int cardsPerRow = 3;
     int numRows = (players.size() + cardsPerRow - 1) / cardsPerRow;
@@ -405,145 +347,7 @@ void showPlayersBoard(std::vector<Player*>& players, Game* game) {
             }
 
             if (gameOver) continue;
-            //    if (showSaveQuestion && targetPlayer != nullptr) {
-            //     // Define the question and buttons here
-            //     sf::Text question;
-            //     question.setFont(font);
-            //     question.setString(targetPlayer->getName() + ", do you want to save yourself?");
-            //     question.setCharacterSize(24);
-            //     question.setFillColor(sf::Color::Black);
-            //     question.setPosition(50, 50);
-
-            //     sf::RectangleShape yesButton(sf::Vector2f(100, 50));
-            //     yesButton.setFillColor(sf::Color::Green);
-            //     yesButton.setPosition(50, 150);
-
-            //     sf::RectangleShape noButton(sf::Vector2f(100, 50));
-            //     noButton.setFillColor(sf::Color::Red);
-            //     noButton.setPosition(200, 150);
-
-            //     sf::Text yesText;
-            //     yesText.setFont(font);
-            //     yesText.setString("Yes");
-            //     yesText.setCharacterSize(20);
-            //     yesText.setFillColor(sf::Color::White);
-            //     yesText.setPosition(70, 160);
-
-            //     sf::Text noText;
-            //     noText.setFont(font);
-            //     noText.setString("No");
-            //     noText.setCharacterSize(20);
-            //     noText.setFillColor(sf::Color::White);
-            //     noText.setPosition(220, 160);
-
-            //     while (showSaveQuestion) {
-            //         sf::Event questionEvent;
-                  
-            //         while (window.pollEvent(questionEvent)) {
-            //             if (questionEvent.type == sf::Event::Closed) {
-            //                 window.close();
-            //                 return;
-            //             }
-
-            //             if (questionEvent.type == sf::Event::MouseButtonPressed) {
-            //                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-            //                 if (yesButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePos))) {
-            //                    //targetPlayer->set_active(true,true);
-            //                     showSaveQuestion = false; // Exit the loop after handling the response
-            //                     cout << targetPlayer->getName() << " saved themselves." << std::endl;
-            //                     break;
-            //                 }
-            //                 if (noButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePos))) {
-                                
-            //                    // targetPlayer->set_active(false,true);
-
-            //                     showSaveQuestion = false; // Exit the loop after handling the response
-            //                     cout << targetPlayer->getName() << " choose not to save themselves." << std::endl;
-            //                     break;
-            //                 }
-            //             }
-            //         }
-            //         // Draw the question and buttons
-            //         window.clear(sf::Color::White);
-            //         window.draw(question);
-            //         window.draw(yesButton);
-            //         window.draw(noButton);
-            //         window.draw(yesText);
-            //         window.draw(noText);
-            //         window.display();
-            //     }
-            //     continue; // Skip the rest of the main loop
-            // }
-
-        //             if (showSaveQuestion && targetPlayer != nullptr) {
-        //     // Define the question and buttons here
-        //     sf::Text question;
-        //     question.setFont(font);
-        //     question.setString(targetPlayer->getName() + ", do you want to save yourself?");
-        //     question.setCharacterSize(24);
-        //     question.setFillColor(sf::Color::Black);
-        //     question.setPosition(50, 50);
-
-        //     sf::RectangleShape yesButton(sf::Vector2f(100, 50));
-        //     yesButton.setFillColor(sf::Color::Green);
-        //     yesButton.setPosition(50, 150);
-
-        //     sf::RectangleShape noButton(sf::Vector2f(100, 50));
-        //     noButton.setFillColor(sf::Color::Red);
-        //     noButton.setPosition(200, 150);
-
-        //     sf::Text yesText;
-        //     yesText.setFont(font);
-        //     yesText.setString("Yes");
-        //     yesText.setCharacterSize(20);
-        //     yesText.setFillColor(sf::Color::White);
-        //     yesText.setPosition(70, 160);
-
-        //     sf::Text noText;
-        //     noText.setFont(font);
-        //     noText.setString("No");
-        //     noText.setCharacterSize(20);
-        //     noText.setFillColor(sf::Color::White);
-        //     noText.setPosition(220, 160);
-
-        //     while (showSaveQuestion) {
-        //         sf::Event questionEvent;
-
-        //         // Use the correct event variable here
-        //         while (window.pollEvent(questionEvent)) {
-        //             if (questionEvent.type == sf::Event::Closed) {
-        //                 window.close();
-        //                 return;
-        //             }
-
-        //             if (questionEvent.type == sf::Event::MouseButtonPressed) {
-        //                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        //                 if (yesButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePos))) {
-        //                     //targetPlayer->set_active(true, true);
-        //                     showSaveQuestion = false; // Exit the loop after handling the response
-        //                     std::cout << targetPlayer->getName() << " saved themselves." << std::endl;
-        //                     break;
-        //                 }
-        //                 if (noButton.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePos))) {
-        //                     //targetPlayer->set_active(false, true);
-        //                     showSaveQuestion = false; // Exit the loop after handling the response
-        //                     std::cout << targetPlayer->getName() << " chose not to save themselves." << std::endl;
-        //                     break;
-        //                 }
-        //             }
-        //         }
-
-        //         // Draw the question and buttons
-        //         window.clear(sf::Color::White);
-        //         window.draw(question);
-        //         window.draw(yesButton);
-        //         window.draw(noButton);
-        //         window.draw(yesText);
-        //         window.draw(noText);
-        //         window.display();
-        //     }
-        //     continue; // Skip the rest of the main loop
-        // }
+            
             
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2i mousePos = sf::Mouse::getPosition(window);
@@ -826,12 +630,11 @@ void showPlayersBoard(std::vector<Player*>& players, Game* game) {
                 }
             }
 
-            // בדוק אם השחקן הנוכחי חסום
             if (currentTurn != -1) {
                 Player* currentPlayer = players[currentTurn];
                 if (currentPlayer->is_active() && currentPlayer->is_sanctioned() && currentPlayer->get_Blocked() && currentPlayer->coins() == 0) {
                     errorMsg = currentPlayer->getName() + " is stuck! Turn is over automatically.";
-                    game->next_turn(); // העבר את התור לשחקן הבא
+                    game->next_turn(); 
                 }
             }
         }
@@ -863,7 +666,7 @@ void showPlayersBoard(std::vector<Player*>& players, Game* game) {
                 if (players[i]->role() == "General") {
                     undoText.setString("block coup");
                 } else if (players[i]->role() == "Judge") {
-                    undoText.setString("undo bribe"); // שם חדש לשופט
+                    undoText.setString("undo bribe"); 
                 } else {
                     undoText.setString("undo");
                 }
@@ -1053,6 +856,11 @@ void showPlayersBoard(std::vector<Player*>& players, Game* game) {
         window.display();
     }
 }
+/**
+ * @brief Displays the main menu and allows players to enter their names.
+ * @param playerNames A vector to store the names of the players.
+ * This function creates a simple GUI with a text input field for each player to enter their name.
+ */
 int main() {
     std::vector<std::string> playerNames;
     showMainMenu(playerNames);

@@ -62,12 +62,25 @@ If arrested, the Merchant pays 2 coins to the treasury instead of losing 1 to an
 - The project includes a `Makefile` for easy compilation.
 - A graphical interface is available via the `GameGUI` class (optional for visualizing the game).
 
-To build the project:
-```bash
-make
-```
+
+- **Build and Run Example**:
+- **Compiler**: `g++`
+  ```bash
+  make Demo
+  ```
+- **Run Tests**:
+  ```bash
+  make run_tests
+  ```
+  - **Clean**:
+  ```bash
+  make clean
+  ```
+  - **Run valgrined**:
+  ```bash
+  make valgrined
+  ```
 * **Project stracture:**
-with run "tree" in terminal
 
 ```bash
 .
@@ -290,7 +303,3 @@ The Spy can view any player’s coin count and block another player’s action (
 ## Demo ##
 A new game is created with players having roles like Governor, Spy, Baron, General, Judge, and Merchant. Each player performs actions such as gather, tax, coup, undo, etc., following the game rules (e.g., you can’t act if it’s not your turn or if you’re sanctioned). The code also handles runtime exceptions for invalid moves and tests various game scenarios. In the end, it shows different game states like rounds played, each player’s coins, and whose turn is next.
 
-
-
-
-# noam_coup

@@ -4,6 +4,7 @@
 #include "Player.hpp"
 using namespace std;
 namespace coup {
+    // Baron.hpp
     class Baron: public Player {;
     private:
         /* data */
