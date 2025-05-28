@@ -116,7 +116,8 @@ void Baron::tax(){
             set_Blocked(false);
             LastMove_of_each_player()="tax";
             _moves_of_each_player.push_back("tax");
-            add_move("tax");}
+            add_move("tax");
+        }
         
     }
 }
