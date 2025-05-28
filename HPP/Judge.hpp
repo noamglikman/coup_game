@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #ifndef JUDGE_HPP
 #define JUDGE_HPP
 #include "Player.hpp"
@@ -17,12 +18,6 @@ namespace coup {
         string getName(){
             return _name;
         };
-        // void gather(){}
-        //void tax(){}
-        //void bride(const Player &player){}
-        //void arrest(const Player &player){}
-        //void sanction(const Player &player){}
-        //void coup(const Player &player);
         void undo_bribe(Player &player);
         ~Judge(){}
         bool is_active() const{

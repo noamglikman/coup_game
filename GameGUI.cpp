@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
@@ -14,9 +15,101 @@
 #include "GameGUI.hpp"
 
 
+// using namespace std;
+// using namespace coup;
+//  //Player* createPlayers(Game& game, std::string playerName, int numPlayers);
+// void runGameSetup(std::vector<std::string>& playerNames) {
+//     sf::RenderWindow window(sf::VideoMode(800, 600), "Game Setup");
+//     sf::Font font;
+//     if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")) {
+//         std::cout << "Failed to load font\n";
+//         return;
+//     }
+
+//     enum class State { AskNumber, AskNames, Done };
+//     State state = State::AskNumber;
+
+//     int numPlayers = 0;
+//     int currentPlayer = 1;
+//     std::string inputText;
+
+//     sf::Text prompt;
+//     prompt.setFont(font);
+//     prompt.setCharacterSize(24);
+//     prompt.setFillColor(sf::Color(255, 0, 255));
+//     prompt.setPosition(50, 50);
+
+//     sf::Text inputDisplay;
+//     inputDisplay.setFont(font);
+//     inputDisplay.setCharacterSize(30);
+//     inputDisplay.setFillColor(sf::Color::Black);
+//     inputDisplay.setPosition(50, 150);
+
+//     while (window.isOpen()) {
+//         sf::Event event;
+//         while (window.pollEvent(event)) {
+//             if (event.type == sf::Event::Closed)
+//                 window.close();
+
+//             else if (event.type == sf::Event::TextEntered) {
+//                 if (event.text.unicode == 8) {
+//                     if (!inputText.empty())
+//                         inputText.pop_back();
+//                 } else if (event.text.unicode == 13) {
+//                     if (!inputText.empty()) {
+//                         if (state == State::AskNumber) {
+//                             try {
+//                                 int n = std::stoi(inputText);
+//                                 if (n >= 2 && n <= 6) {
+//                                     numPlayers = n;
+//                                     playerNames.reserve(numPlayers);
+//                                     inputText.clear();
+//                                     currentPlayer = 1;
+//                                     state = State::AskNames;
+//                                 } else {
+//                                     inputText.clear();
+//                                 }
+//                             } catch (...) {
+//                                 inputText.clear();
+//                             }
+//                         } else if (state == State::AskNames) {
+//                             playerNames.push_back(inputText);
+//                             inputText.clear();
+//                             currentPlayer++;
+//                             if (currentPlayer > numPlayers) {
+//                                 state = State::Done;
+//                                 window.close();
+//                             }
+//                         }
+//                     }
+//                 } else if (event.text.unicode < 128) {
+//                     inputText += static_cast<char>(event.text.unicode);
+//                 }
+//             }
+//         }
+
+//         if (state == State::AskNumber) {
+//             prompt.setString("Enter number of players (2-6):");
+//         } else if (state == State::AskNames) {
+//             prompt.setString("Enter name for player " + std::to_string(currentPlayer) + ":");
+//         }
+
+//         inputDisplay.setString(inputText);
+
+//         window.clear(sf::Color(230, 230, 255));
+//         window.draw(prompt);
+//         window.draw(inputDisplay);
+//         window.display();
+//     }
+// }
+#include <SFML/Graphics.hpp>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
 using namespace std;
 using namespace coup;
- //Player* createPlayers(Game& game, std::string playerName, int numPlayers);
+
 void runGameSetup(std::vector<std::string>& playerNames) {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Game Setup");
     sf::Font font;
@@ -44,6 +137,9 @@ void runGameSetup(std::vector<std::string>& playerNames) {
     inputDisplay.setFillColor(sf::Color::Black);
     inputDisplay.setPosition(50, 150);
 
+    std::string errorMessage;
+    sf::Clock errorClock;
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -51,10 +147,10 @@ void runGameSetup(std::vector<std::string>& playerNames) {
                 window.close();
 
             else if (event.type == sf::Event::TextEntered) {
-                if (event.text.unicode == 8) {
+                if (event.text.unicode == 8) { // Backspace
                     if (!inputText.empty())
                         inputText.pop_back();
-                } else if (event.text.unicode == 13) {
+                } else if (event.text.unicode == 13) { // Enter
                     if (!inputText.empty()) {
                         if (state == State::AskNumber) {
                             try {
@@ -65,19 +161,32 @@ void runGameSetup(std::vector<std::string>& playerNames) {
                                     inputText.clear();
                                     currentPlayer = 1;
                                     state = State::AskNames;
+                                    errorMessage.clear();
                                 } else {
+                                    errorMessage = "Number must be between 2 and 6.";
+                                    errorClock.restart();
                                     inputText.clear();
                                 }
                             } catch (...) {
+                                errorMessage = "Invalid number entered.";
+                                errorClock.restart();
                                 inputText.clear();
                             }
                         } else if (state == State::AskNames) {
-                            playerNames.push_back(inputText);
-                            inputText.clear();
-                            currentPlayer++;
-                            if (currentPlayer > numPlayers) {
-                                state = State::Done;
-                                window.close();
+                            if (std::find(playerNames.begin(), playerNames.end(), inputText) != playerNames.end()) {
+                                // שם קיים כבר
+                                errorMessage = "Name already taken, try another.";
+                                errorClock.restart();
+                                inputText.clear();
+                            } else {
+                                playerNames.push_back(inputText);
+                                inputText.clear();
+                                currentPlayer++;
+                                errorMessage.clear();
+                                if (currentPlayer > numPlayers) {
+                                    state = State::Done;
+                                    window.close();
+                                }
                             }
                         }
                     }
@@ -87,10 +196,19 @@ void runGameSetup(std::vector<std::string>& playerNames) {
             }
         }
 
-        if (state == State::AskNumber) {
-            prompt.setString("Enter number of players (2-6):");
-        } else if (state == State::AskNames) {
-            prompt.setString("Enter name for player " + std::to_string(currentPlayer) + ":");
+        // הצגת הודעה - אם יש שגיאה והיא לא עברה יותר מ-3 שניות, מציגים את errorMessage
+        if (!errorMessage.empty()) {
+            if (errorClock.getElapsedTime().asSeconds() < 3.0f) {
+                prompt.setString(errorMessage);
+            } else {
+                errorMessage.clear();
+            }
+        } else {
+            if (state == State::AskNumber) {
+                prompt.setString("Enter number of players (2-6):");
+            } else if (state == State::AskNames) {
+                prompt.setString("Enter name for player " + std::to_string(currentPlayer) + ":");
+            }
         }
 
         inputDisplay.setString(inputText);
@@ -101,7 +219,6 @@ void runGameSetup(std::vector<std::string>& playerNames) {
         window.display();
     }
 }
-
 void showMainMenu(std::vector<std::string>& playerNames) {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Coup");
     sf::Font font;

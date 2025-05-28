@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #include "Game.hpp"
 #include <exception>
 #include <iostream>
@@ -8,8 +9,11 @@
 
 using namespace std;
 namespace coup{
-
-
+    /**
+     * @brief Constructs a new Player object.
+     * @param game Reference to the game the player is participating in.
+     * @param name The name of the player.
+     */
     Player::Player(Game &game, const string &name): _game(game), _name(name), _role(""), _is_active(true), _coinNum(0) {
         if (_name.empty()) {
             throw invalid_argument("Player name cannot be empty");
@@ -17,7 +21,15 @@ namespace coup{
         if (_game.players().size() >= 6) {
             throw runtime_error("Game is full");
         }
+        for(int i=0;i<game.players().size();i++){
+            if(name==game.getNameini(i)){
+                cout<<"name is already exist"<<endl;
+                throw runtime_error("name is already exist");
+                
+            }
+        }
         _game.add_player(this);
+        
     }
 
     void Player::gather() {
@@ -86,28 +98,11 @@ namespace coup{
         }
         if(one_turn_is_over==0&&_sanctioned==true){
             throw runtime_error("You can't tax after you have been sanctioned");
-            
         }
         if(_coinNum>=10){
             throw runtime_error("you must coup someone because you have more then 10 coins,choose player to coup");
         }
-        // if(_sanctioned==true&&_Blocked==true&&coins()==0){
-        //     _game.next_turn();
-        //     throw runtime_error("you have been stuck,turn is over");
-        // }
-
         start();
-        // if(_role=="Baron"&&_sanctioned==true){
-        //     _coinNum+=1;
-        //     cout<< _name << " taxed "<<_role << endl;
-        //     if(LastMove_of_each_player()!="bride"){
-        //         _game.add_last_played(this);
-        //         _game.next_turn();
-        //          set_Blocked(false);
-        //      }
-        // add_move("tax");
-        // }
-        //else{
         if(_role=="Governor"&&_sanctioned==false){
         _coinNum+=3;
         cout<< _name << " taxed "<<_role << endl;
@@ -140,8 +135,6 @@ namespace coup{
                 cout<<_name<<" can bribe now"<<endl;
             }
              add_move("tax");
-             
-            _moves_of_each_player.push_back("tax");
         }
     //}
         
@@ -160,26 +153,30 @@ void Player::coup(Player &player,bool using_gui){
     if(_coinNum<7){
         throw runtime_error("You need 7 coins to coup");
     } 
+    if(player==*this){
+       throw runtime_error("you cant activate this action on yourself");
+    }
      start();
     cout<< player.getName() << " couped" << endl;
     _coinNum-=7;
     //player.set_active(false);
     _game.remove_player(player,using_gui);
-    add_move("coup");
+    
     _couped = player.getName();
     _game.set_last_couped_player(&player);
     cout<<_game.get_last_couped_player()->getName()<<" is the last player that was couped"<<endl;
-    if(LastMove_of_each_player()!="bride"){
+    if(LastMove_of_each_player()!="bribe"){
         _game.next_turn();
         player.set_Blocked(false);
-        }
-        if(LastMove_of_each_player()=="bribe"&&_cant_bribe==true){// חסום למרות שעשה bribe
-        _game.add_last_played(this);
-        _game.next_turn();
-        player.set_Blocked(false);
-        _cant_bribe=false;//כבר לא חסום
-        cout<<_name<<" can bribe now"<<endl;
     }
+    if(LastMove_of_each_player()=="bribe"&&_cant_bribe==true){// חסום למרות שעשה bribe
+    _game.add_last_played(this);
+    _game.next_turn();
+    player.set_Blocked(false);
+    _cant_bribe=false;//כבר לא חסום
+    cout<<_name<<" can bribe now"<<endl;
+    }
+    add_move("coup");
     one_turn_is_over=1;
     _sanctioned==false;
 }
@@ -199,14 +196,20 @@ void Player::coup(Player &player,bool using_gui){
             throw runtime_error("you must coup someone because you have more then 10 coins,choose player to coup");
         }
         if(coins() < 4){
-            throw runtime_error("You can't bride a player with less then 4 coins,try someone else...");
+            throw runtime_error("You can't bribe  with less then 4 coins,try someone else...");
+        }
+        if ((is_sanctioned() &&get_Blocked() == true && coins() <3 )||is_sanctioned() 
+        && _game.get_can_do_arrest(_game.get_players(),this)==false)
+        {
+             std::cout << getName() << " is stuck! Turn is over automatically." << std::endl;
+            _game.next_turn(); 
         }
         start();
         _coinNum-=4;
         add_move("bribe");
         _moves_of_each_player.push_back("bribe");
-        one_turn_is_over=1;
-        _sanctioned==false;
+        one_turn_is_over=0;
+        //_sanctioned==false;
     }
 
 
@@ -223,23 +226,25 @@ void Player::coup(Player &player,bool using_gui){
     if (get_Blocked()) {
         throw runtime_error("You are blocked and cannot arrest others");
     }
-    
+    if(player==*this){
+       throw runtime_error("you cant activate this action on yourself");
+    }
     if (_game.get_last_arrested() == player.getName()) {
         throw runtime_error("You can't arrest the same player twice in a row");
-    }else
-        {
-            if(_coinNum>=10){
-            throw runtime_error("you must coup someone because you have more then 10 coins,choose player to coup");
-        }
+    }
+    if(_coinNum>=10){
+        throw runtime_error("you must coup someone because you have more then 10 coins,choose player to coup");
+    }
         start();
         if(player.role() == "General"&&player.is_active()==true){
             cout<<"arrested general thats why nothing happened"<<endl;
             _game.add_last_arrested(player.getName());
             _moves_of_each_player.push_back("arrest");
-            if(LastMove_of_each_player()!="bride"){
+            if(LastMove_of_each_player()!="bribe"){
                 _game.add_last_played(this);
                 LastMove_of_each_player()="arrest";
-                add_move("arrest");
+                //add_move("arrest");
+                _game.set_can_do_arrest(true);
                 _game.next_turn();
                 player.set_Blocked(false);
                 }
@@ -247,15 +252,14 @@ void Player::coup(Player &player,bool using_gui){
             _sanctioned==false;}else{if(player.role()=="Merchant"&&player.is_active()==true){
             cout<< player.getName() << " arrested" << endl;
             _game.add_last_arrested(player.getName());
-            add_move("arrest");
-            LastMove_of_each_player()="arrest";
-            _moves_of_each_player.push_back("arrest");
+            _game.set_can_do_arrest(true);
             player.set_coins(player.coins()-2);
-            if(LastMove_of_each_player()!="bride"){
+            if(LastMove_of_each_player()!="bribe"){
                 _game.add_last_played(this);
                 _game.next_turn();
                 player.set_Blocked(false);
-                }
+            }
+            add_move("arrest");
             one_turn_is_over=1;
             _sanctioned==false;}
         else{
@@ -264,23 +268,21 @@ void Player::coup(Player &player,bool using_gui){
             _game.add_last_arrested(player.getName());
             player.set_coins(player.coins()-1);
             _coinNum+=1;
-            add_move("arrest");
-            LastMove_of_each_player()="arrest";
-            _moves_of_each_player.push_back("arrest");
-            if(LastMove_of_each_player()!="bride"){
+            _game.set_can_do_arrest(true);
+            if(LastMove_of_each_player()!="bribe"){
                 _game.add_last_played(this);
                 _game.next_turn();
                 player.set_Blocked(false);
             }
-                
+            add_move("arrest");
             one_turn_is_over=1;
             _sanctioned==false;
+            //_game.set_can_do_arrest(true);
             }else{
                 throw runtime_error("You can't arrest a player with 0 coins or if he is dead");
             }
         }}
-        
-    }         
+                
 }
     void Player:: sanction(Player &player){
         if(_game.is_game_over()) {
@@ -295,6 +297,9 @@ void Player::coup(Player &player,bool using_gui){
         if(_coinNum>=10){
             throw runtime_error("you must coup someone because you have more then 10 coins,choose player to coup");
         }
+        if(player==*this){
+        throw runtime_error("you cant activate this action on yourself");
+        }
         if(player.role()=="Judge"&&player.is_active()==true){
             if(_coinNum<4){
                 throw runtime_error("You need 4 coins to sanction a judge");
@@ -303,15 +308,16 @@ void Player::coup(Player &player,bool using_gui){
             player._sanctioned=true;
             player.set_one_turn_is_over();
             _coinNum-=4;
-            add_move("sanction");
-            if(LastMove_of_each_player()!="bride"){
+            if(LastMove_of_each_player()!="bribe"){
                 _game.add_last_played(this);
                 _game.next_turn();
                 player.set_Blocked(false);
              }
+            add_move("sanction");
             //one_turn_is_over=1;
             _sanctioned==false;
         }else{
+
             if(_coinNum<3){
                 throw runtime_error("You need 3 coins to sanction a player");
             }
@@ -319,14 +325,13 @@ void Player::coup(Player &player,bool using_gui){
                 cout<< player.getName() << " sanctioned" << endl;
             player._sanctioned=true;
             _coinNum-=3;
-            add_move("sanction");
-            LastMove_of_each_player()="sanction";
-            _moves_of_each_player.push_back("sanction");
-            if(LastMove_of_each_player()!="bride"){
+            
+            if(LastMove_of_each_player()!="bribe"){
                 _game.add_last_played(this);
                 _game.next_turn();
                 player.set_Blocked(false);
              }
+            add_move("sanction");
             one_turn_is_over=1;
             _sanctioned=false;}
             else{throw runtime_error("You can't sanction a player  if he is dead");}

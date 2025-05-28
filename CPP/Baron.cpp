@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #include <iostream>
 #include <vector>
 #include <string>
@@ -9,6 +10,18 @@
 using namespace std;
 
 namespace coup{
+    /**
+ * @brief Override the invest method for the Baron class, which allows the Baron to exchange 3 coins for 6.
+ *        This action is only possible if the Baron has more than 3 coins.
+ * 
+ * @throws std::runtime_error if the game is over.
+ * @throws std::runtime_error if the player is not active.
+ * @throws std::runtime_error if it is not the player's turn.
+ * @throws std::runtime_error if the player has 10 or more coins (must coup instead).
+ * @throws std::runtime_error if the player has 3 or fewer coins.
+ * 
+ * @return void
+ */
 void Baron::invest(){
     if(_game.is_game_over()) {
         throw runtime_error("Game is over, you can't gather");
@@ -31,20 +44,31 @@ void Baron::invest(){
     }
     add_coins(3);
     cout<<"Baron traded its 3 coins and got 6"<<endl;
-    add_move("invest");
     LastMove_of_each_player()="invest";
-    _moves_of_each_player.push_back("invest");
     if(LastMove_of_each_player()!="bride"){
         _game.next_turn();
         set_Blocked(false);
-     }
+    }
      if(LastMove_of_each_player()=="bribe"&&_cant_bribe==false){
         _game.next_turn();
         set_Blocked(false);
         _cant_bribe=true;
         cout<<_name<<" can bribe now"<<endl;
     }
+    add_move("invest");
 }
+/**
+ * @brief Override the invest method for the Baron class, which allows the Baron to exchange 3 coins for 6.
+ *        This action is only possible if the Baron has more than 3 coins.
+ * 
+ * @throws std::runtime_error if the game is over.
+ * @throws std::runtime_error if the player is not active.
+ * @throws std::runtime_error if it is not the player's turn.
+ * @throws std::runtime_error if the player has 10 or more coins (must coup instead).
+ * @throws std::runtime_error if the player has 3 or fewer coins.
+ * 
+ * @return void
+ */
 void Baron::tax(){
         if (!_is_active) {
             throw runtime_error("Player is not active");

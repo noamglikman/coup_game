@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #ifndef SPY_HPP
 #define SPY_HPP
 #include "Player.hpp"
@@ -16,13 +17,6 @@ namespace coup {
         string getName(){
             return _name;
         };
-        // void gather(){}
-        //void tax();
-        //void bride(const Player &player){}
-        //void arrest(const Player &player);
-        //void sanction(const Player &player){}
-        //void coup(const Player &player);
-        //void pre_undo(const Player &player){}
         int get_coins(Player &player);
         void block(Player &player);
         ~Spy(){}

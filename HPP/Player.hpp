@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 #include <iostream>
@@ -82,9 +83,10 @@ namespace coup {
             _name = other._name;
             _coinNum = other._coinNum;
             _is_active = other._is_active;
-            
-
             return *this;
+        }
+        bool operator==(const Player&player){
+            return player._name==_name;
         }
         bool is_sanctioned() const{
             return _sanctioned;

@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #ifndef GOVERNOR_HPP
 #define GOVERNOR_HPP
 #include "Player.hpp"
@@ -17,12 +18,6 @@ namespace coup {
         string getName(){
             return _name;
         };
-        // void gather(){}
-        //void tax();
-        //void bride(const Player &player){}
-        //void arrest(const Player &player){}
-        //void sanction(const Player &player){}
-        //void coup(const Player &player);
         void undo(Player &player);
         ~Governor(){}
         bool is_active() const{

@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #include <iostream>
 #include <vector>
 #include <string>
@@ -17,22 +18,16 @@ namespace coup{
         return player.coins();
     }
     void Spy::block(Player &player) {
-    if (_game.is_game_over()) {
-        throw runtime_error("Game is over, you can't block");
-    }
-
-    LastMove_of_each_player() = "block";
-    _moves_of_each_player.push_back("block");
-    player.LastMove_of_each_player() = "blocked";
-    player.set_Blocked(true);
-
-    cout << _name << " blocked " << player.getName() << endl;
-
-    // בדוק אם השחקן "תקוע" לאחר החסימה
-    if (player.is_sanctioned() && player.get_Blocked() && player.coins() == 0) {
-        cout << player.getName() << " is stuck after being blocked! Turn is over automatically." << endl;
-        _game.next_turn(); // העבר את התור לשחקן הבא
-    }
+        if (_game.is_game_over()) {
+            throw runtime_error("Game is over, you can't block");
+        }
+        if(player==*this){
+            throw runtime_error("you cant activate this action on yourself");
+        }
+        add_move("block");
+        player.add_move("block");
+        player.set_Blocked(true);
+        cout << _name << " blocked " << player.getName() << endl;
 }
     
     

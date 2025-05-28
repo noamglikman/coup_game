@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #ifndef MERCHANT_HPP
 #define MERCHANT_HPP
 #include "Player.hpp"
@@ -24,9 +25,6 @@ namespace coup {
         void set_active(bool is_active,bool using_gui=false){
             _is_active = is_active;
         }
-        // void set_active(bool is_active){
-        //     _is_active = is_active;
-        // }
         int coins() const{
             return _coinNum;
         }

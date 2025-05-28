@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #ifndef BARON_HPP
 #define BARON_HPP
 #include "Player.hpp"
@@ -16,12 +17,7 @@ namespace coup {
         string getName(){
             return _name;
         }
-        //void gather();
         void tax();
-        //void bride(const Player &player){}
-        //void arrest(const Player &player){}
-        //void sanction(const Player &player){}
-        //void coup(const Player &player);
         void undo(const Player &player){}
         void invest();
         bool is_active() const{
@@ -30,9 +26,6 @@ namespace coup {
         void set_active(bool is_active,bool using_gui=false){
             _is_active = is_active;
         }
-        // void set_active(bool is_active){
-        //     _is_active = is_active;
-        // }
         int coins() const{
             return _coinNum;
         }

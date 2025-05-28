@@ -28,6 +28,9 @@ namespace coup {
             }
             return player_names;
         }
+        vector<Player*> get_players(){
+            return _players;
+        }
         // Returns the name of the current players
         string getNameini(int i){
             return _players[i]->getName();
@@ -40,36 +43,34 @@ namespace coup {
         void remove_player(Player& player,bool using_gui=false);
         //next turn
         void next_turn() {
-    // פתח את החסימה של השחקן האחרון ששיחק (אם יש כזה)
-    if (!last_played.empty()) {
-        Player* last = last_played.back();
-        if (last != nullptr) {
-            last->set_sanctioned(false); // ודא שיש set_sanctioned(bool) במחלקת Player
-            last->set_one_turn_is_over();
+        // פתח את החסימה של השחקן האחרון ששיחק (אם יש כזה)
+        if (!last_played.empty()) {
+            Player* last = last_played.back();
+            if (last != nullptr) {
+                last->set_sanctioned(false); // ודא שיש set_sanctioned(bool) במחלקת Player
+                last->set_one_turn_is_over();
+            }
         }
+
+        do {
+            index++;
+            Player* currentPlayer = _players[index % _players.size()];
+
+            if (!currentPlayer->is_active()) {
+                continue; 
+            }
+
+            if ((currentPlayer->is_sanctioned() && currentPlayer->get_Blocked() == true && currentPlayer->coins() <3 )||(currentPlayer->is_sanctioned() 
+            && get_can_do_arrest(_players,currentPlayer)==false&&currentPlayer->coins() <3))
+            {
+                std::cout << currentPlayer->getName() << " is stuck! Turn is over automatically." << std::endl;
+                continue; 
+            }
+            _turn = currentPlayer->getName();
+            std::cout << "Turn updated to: " << _turn << std::endl;
+            break;
+        } while (true);
     }
-
-    do {
-        index++;
-        Player* currentPlayer = _players[index % _players.size()];
-
-        // דלג על שחקנים שאינם פעילים
-        if (!currentPlayer->is_active()) {
-            continue; // דלג לשחקן הבא
-        }
-
-        // בדוק אם השחקן "תקוע"
-        if (currentPlayer->is_sanctioned() && currentPlayer->get_Blocked() == true && currentPlayer->coins() == 0) {
-            std::cout << currentPlayer->getName() << " is stuck! Turn is over automatically." << std::endl;
-            continue; // דלג לשחקן הבא
-        }
-
-        // אם השחקן לא תקוע ולא מת, עדכן את התור
-        _turn = currentPlayer->getName();
-        std::cout << "Turn updated to: " << _turn << std::endl; // הודעה למעקב
-        break;
-    } while (true);
-}
         string winner(){
             int count=0;
             for(int i = 0; i < _players.size(); i++) {
@@ -118,8 +119,7 @@ namespace coup {
                 throw runtime_error("No players available for undo coup");
             }
         }
-        Game& operator=(const Game& other) ;
-        // הוסף במחלקה Game:
+        Game& operator=(const Game& other);
 
         void add_last_played(Player* player) {
         last_played.push_back(player);
@@ -137,10 +137,22 @@ namespace coup {
         }
         Player* get_last_couped_player() const { return _last_couped_player; }
         void set_last_couped_player(Player* p) { _last_couped_player = p; }
-            ~Game(){}
-            // Destructor
+        void set_can_do_arrest(bool _can_do_arrest){
+            _can_do_arrest=_can_do_arrest;
+        }
+        bool get_can_do_arrest(vector<Player*> players,Player *currentPlayer){
+            for(int i=0;i<players.size();i++){
+                if(_players[i]->is_active() == true&&_players[i]!=currentPlayer&&get_last_arrested()!=_players[i]->getName()){
+                    return true;
+                }
+            }
+            return false;
+        }
+        ~Game(){}
+        // Destructor
 
     private:
+        bool _can_do_arrest=true;
         vector<Player*> _players;
         std::string winnerMsg = "";
         vector<string>last_arrested;

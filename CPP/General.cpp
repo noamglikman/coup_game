@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <iostream>
@@ -12,6 +13,23 @@
 using namespace std;
 
 namespace coup{
+    /**
+ * @brief Allows the General to undo the last coup action made by any player, by paying 5 coins.
+ *
+ * This method verifies the validity of the undo operation by checking that the General has enough coins,
+ * the game is not over, and the last move of the target player was a coup.
+ * If successful, the last couped player is reactivated, and the move is registered as "undo_coup".
+ *
+ * @param player Reference to the player whose last move will be undone (must be a coup).
+ *
+ * @throws std::runtime_error If the game is over.
+ * @throws std::runtime_error If the General is not active.
+ * @throws std::runtime_error If the General does not have at least 5 coins.
+ * @throws std::runtime_error If the player's last move was not a coup.
+ * @throws std::runtime_error If there is no valid last couped player to restore.
+ *
+ * @return void
+ */
     void General::undo_coup(Player &player) {
         if(_game.is_game_over()) {
             throw runtime_error("Game is over, you can't gather");
@@ -37,14 +55,22 @@ namespace coup{
         LastMove_of_each_player()= "undo_coup"; // Update the last move of the player
          _moves_of_each_player.push_back("undo_coup");
         add_move("undo_coup");
-        _coinNum -= 5; // מפחית 5 מטבעות מהשחקן
+        _coinNum -= 5; 
         cout << _game.get_last_couped_player()->getName() << " undoed coup" << endl;
 
         // אפס את השדה אחרי undo
         _game.set_last_couped_player(nullptr);
     }
 
-
+    /**
+ * @brief Displays a GUI dialog using SFML to ask the player whether they wish to pay 5 coins to stay alive.
+ *
+ * The dialog provides YES and NO buttons. If YES is clicked, the function returns true;
+ * otherwise, or if the window is closed, it returns false.
+ *
+ * @return true if the user clicks "YES" to pay and stay alive.
+ * @return false if the user clicks "NO" or closes the window.
+ */
     bool General::askToStayAlive() {
         sf::RenderWindow window(sf::VideoMode(400, 200), "Stay Alive?");
         sf::Font font;

@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #include <iostream>
 #include <vector>
 #include <string>
@@ -8,5 +9,5 @@
 
 using namespace std;
 namespace coup{
-
+///
 }

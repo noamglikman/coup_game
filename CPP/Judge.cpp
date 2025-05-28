@@ -1,3 +1,4 @@
+//noamglikman1@gmail.com
 #include <iostream>
 #include <vector>
 #include <string>
@@ -7,6 +8,22 @@
 using namespace std;
 
 namespace coup{
+    /**
+ * @brief Allows the Judge to undo a bribe made by another player.
+ *
+ * This method enables a Judge to cancel the effect of a bribe previously performed by another player.
+ * It marks the bribing player as blocked from bribing again and forces a turn advancement.
+ *
+ * @param player The player whose bribe action is being undone.
+ *
+ * @throws std::runtime_error If the game is over.
+ * @throws std::runtime_error If the Judge is not active.
+ * @throws std::runtime_error If the Judge has 10 or more coins (must perform a coup).
+ * @throws std::runtime_error If the Judge attempts to undo their own action.
+ * @throws std::runtime_error If the target player's last move was not "bribe".
+ *
+ * @return void
+ */
     
 void Judge::undo_bribe(Player &player){
     if(_game.is_game_over()) {
@@ -17,6 +34,9 @@ void Judge::undo_bribe(Player &player){
     }
     if(_coinNum>=10){
         throw runtime_error("you must coup someone because you have more then 10 coins,choose player to coup");
+    }
+    if(player==*this){
+       throw runtime_error("you cant activate this action on yourself");
     }
     if(player.LastMove_of_each_player()!="bribe"){
         throw runtime_error("Judge can undo only bribe");
