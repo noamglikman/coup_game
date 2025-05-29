@@ -294,6 +294,9 @@ if (_game.turn() != _name) {
 if (get_Blocked()) {
     throw runtime_error("You are blocked and cannot arrest others");
 }
+if(player.coins()==0){
+    throw runtime_error("you cant arrest someone with 0 coins");
+}
 //cant arrest themself
 if(player==*this){
     throw runtime_error("you cant activate this action on yourself");

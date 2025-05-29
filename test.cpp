@@ -470,6 +470,20 @@ TEST_CASE("sanction"){
     CHECK_THROWS_AS(spy.tax(),std::runtime_error);
 }
 
+TEST_CASE("arrest"){
+    coup::Game game;
+    Governor governor(game, "Noam");
+    Spy spy(game, "Taliya");
+    merchant merchant(game,"rei");
+    for(int i = 0; i <3; ++i) {
+        governor.gather();
+        spy.gather();
+        merchant.tax();
+    }
+    governor.sanction(spy);
+    CHECK_THROWS_AS(spy.arrest(governor),std::runtime_error);
+}
+
 
 //When a spy tries to perform an undo for tax as per his role,
 // but the player has already used his money and now there is no money he can return.
