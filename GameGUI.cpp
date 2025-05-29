@@ -335,7 +335,7 @@ void showPlayersBoard(std::vector<Player*>& players, Game* game) {
         if (!gameOver) {
             try {
                 winnerMsg = game->winner();
-                gameOver = true;
+                if(winnerMsg!=""){gameOver = true;}
             } catch (const std::exception&) {}
         }
 
