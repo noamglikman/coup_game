@@ -101,7 +101,7 @@ namespace coup {
                 }
             }
             if(count>1){
-                throw runtime_error("Game is not over yet");
+                return"";
             }
             else{
                 _game_over = true;

@@ -549,3 +549,99 @@ TEST_CASE(" is stuck with bribe! Turn is over automatically "){
     baron.bribe();
     CHECK_THROWS_AS(baron.tax(),std::runtime_error);
 }
+//Basic actions before and after the game ends
+//I checked the actions that will be blocked because the
+// game is definitely over and not because of another error
+// such as the player on whom the action is being performed is dead, etc.
+TEST_CASE("oll action on Baron and General"){
+    coup::Game game;
+    General general(game, "Noam");
+    Baron baron(game, "Taliya");
+    general.gather();
+    baron.gather();
+    CHECK(general.coins()==1);
+    CHECK(baron.coins()==1);
+    general.tax();
+    baron.tax();
+    CHECK(general.coins()==3);
+    CHECK(baron.coins()==3);
+    general.arrest(baron);
+    CHECK(general.coins()==4);
+    CHECK(baron.coins()==2);
+    baron.gather();
+    for(int i = 0; i < 3; ++i) {
+    general.tax();
+    baron.gather();
+    }
+    general.coup(baron);
+    
+    CHECK_THROWS_AS(baron.gather(),std::runtime_error);
+    CHECK_THROWS_AS(general.tax(),std::runtime_error);
+    CHECK_THROWS_AS(general.gather(),std::runtime_error);
+    CHECK_THROWS_AS(general.bribe(),std::runtime_error);
+    //cout<<game.winner()<<endl;
+}
+
+//Basic actions before and after the game ends
+//I checked the actions that will be blocked because the
+// game is definitely over and not because of another error
+// such as the player on whom the action is being performed is dead, etc.
+TEST_CASE("oll action on merchant and Governor"){
+    coup::Game game;
+    merchant merchant(game, "Noam");
+    Governor governor(game, "Taliya");
+    merchant.gather();
+    governor.gather();
+    CHECK(merchant.coins()==1);
+    CHECK(governor.coins()==1);
+    merchant.tax();
+    governor.tax();
+    CHECK(merchant.coins()==3);
+    CHECK(governor.coins()==4);
+    merchant.arrest(governor);
+    CHECK(merchant.coins()==5);
+    CHECK(governor.coins()==3);
+    governor.gather();
+    merchant.tax();
+    governor.gather();
+    merchant.coup(governor);
+    
+    CHECK_THROWS_AS(governor.gather(),std::runtime_error);
+    CHECK_THROWS_AS(merchant.tax(),std::runtime_error);
+    CHECK_THROWS_AS(merchant.gather(),std::runtime_error);
+    CHECK_THROWS_AS(merchant.bribe(),std::runtime_error);
+    //cout<<game.winner()<<endl;
+}
+
+//Basic actions before and after the game ends
+//I checked the actions that will be blocked because the
+// game is definitely over and not because of another error
+// such as the player on whom the action is being performed is dead, etc.
+TEST_CASE("oll action on merchant and Governor"){
+    coup::Game game;
+    Judge Judge(game, "Noam");
+    Spy spy(game, "Taliya");
+    Judge.gather();
+    spy.gather();
+    CHECK(Judge.coins()==1);
+    CHECK(spy.coins()==1);
+    Judge.tax();
+    spy.tax();
+    CHECK(Judge.coins()==3);
+    CHECK(spy.coins()==3);
+    Judge.arrest(spy);
+    CHECK(Judge.coins()==4);
+    CHECK(spy.coins()==2);
+    spy.gather();
+    for(int i = 0; i < 3; ++i) {
+    Judge.tax();
+    spy.gather();
+    }
+    Judge.coup(spy);
+    
+    CHECK_THROWS_AS(spy.gather(),std::runtime_error);
+    CHECK_THROWS_AS(Judge.tax(),std::runtime_error);
+    CHECK_THROWS_AS(Judge.gather(),std::runtime_error);
+    CHECK_THROWS_AS(Judge.bribe(),std::runtime_error);
+    //cout<<game.winner()<<endl;
+}

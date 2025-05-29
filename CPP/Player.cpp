@@ -40,7 +40,8 @@ namespace coup{
      */
     void Player::gather() {
         // Check if the game is over
-        if(_game.is_game_over()) {
+        if(_game.is_game_over()==true) {
+            cout<<"Game is over"<<endl;
             throw runtime_error("Game is over, you can't gather");
         }
         // Check if the player is active
@@ -102,8 +103,9 @@ namespace coup{
         } 
     void Player::tax(){
         // Check if the game is over
-        if(_game.is_game_over()) {
-            throw runtime_error("Game is over, you can't gather");
+        if(_game.is_game_over()==true) {
+            cout<<"Game is over"<<endl;
+            throw runtime_error("Game is over, you can't tax");
         }
         // Check if the player is active
         if (!_is_active) {
@@ -171,8 +173,9 @@ namespace coup{
      */
 void Player::coup(Player &player,bool using_gui){
     // Check if the game is over
-    if(_game.is_game_over()) {
-            throw runtime_error("Game is over, you can't gather");
+    if(_game.is_game_over()==true) {
+            cout<<"Game is over"<<endl;
+            throw runtime_error("Game is over, you can't coup");
         }
     // Check if the player is active
     if (!_is_active) {
@@ -220,12 +223,20 @@ void Player::coup(Player &player,bool using_gui){
     add_move("coup");
     one_turn_is_over=1;
     _sanctioned==false;
+    
+    //When there is an option that the game is over, we will update the field that 
+    //announces this and so for each test at 
+    //the beginning of each action we will throw an error if necessary.
+    if(_game.winner()!=""){
+        _game.is_game_over()==true;
+    }
 }
  
 void Player:: bribe(){
     // Check if the game is over
-    if(_game.is_game_over()) {
-        throw runtime_error("Game is over, you can't gather");
+    if(_game.is_game_over()==true) {
+        cout<<"Game is over"<<endl;
+        throw runtime_error("Game is over, you can't bribe");
     }
     // Check if the player is active
     if (!_is_active) {
@@ -278,8 +289,9 @@ string Player::_get_couped(){
  */
 void Player:: arrest(Player &player){
 // Check if the game is over
-if(_game.is_game_over()) {
-    throw runtime_error("Game is over, you can't gather");
+if(_game.is_game_over()==true) {
+    cout<<"Game is over"<<endl;
+    throw runtime_error("Game is over, you can't arrest");
 }
 // Check if the player is active
 if (!_is_active) 
@@ -372,8 +384,9 @@ if(_coinNum>=10){
  */
 void Player:: sanction(Player &player){
     // Check if the game is over
-    if(_game.is_game_over()) {
-        throw runtime_error("Game is over, you can't gather");
+    if(_game.is_game_over()==true) {
+        cout<<"Game is over"<<endl;
+        throw runtime_error("Game is over, you can't sanction");
     }
     // Check if the player is active
     if (!_is_active) {

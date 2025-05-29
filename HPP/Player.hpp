@@ -32,7 +32,6 @@ namespace coup {
             return _is_active;
         }
         virtual void set_active(bool is_active,bool using_gui=false){
-        
             _is_active = is_active;
         }
         virtual int coins() const{
